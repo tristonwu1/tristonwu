@@ -87,16 +87,14 @@ export default async function AboutPage() {
                     ) : null
                   )}
                 </div>
-                {about.cvFile ? (
-                  <a
-                    className="about-cv-download"
-                    href={about.cvFile}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Download CV (PDF)
-                  </a>
-                ) : null}
+                <a
+                  className="about-cv-download"
+                  href="/about/cv"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download CV (PDF)
+                </a>
               </div>
             ) : null}
 

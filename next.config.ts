@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // @react-pdf relies on Node internals; keep it out of the bundler.
+  serverExternalPackages: ["@react-pdf/renderer"],
+  // Ensure the CV fonts ship with the serverless function on Vercel.
+  outputFileTracingIncludes: {
+    "/about/cv": ["./src/cv/fonts/**"],
+  },
   ...(process.env.NODE_ENV === "development"
     ? { allowedDevOrigins: localDevOrigins() }
     : {}),
