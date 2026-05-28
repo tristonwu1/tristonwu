@@ -17,7 +17,7 @@ const sans = Martel_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Triston Wu — Furniture & Objects",
+  title: "Triston Wu",
   description:
     "Portfolio of furniture and object design by Triston Wu.",
 };
