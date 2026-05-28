@@ -5,8 +5,17 @@ import { createSeededRandom, type RockTransform } from "@/lib/rockPlacement";
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const TOP_REGION = 0.34;
 const BOTTOM_REGION = 0.34;
-/** Horizontal tolerance for pairing an upper vertex with a lower one. */
-const PAIR_RADIUS_RATIO = 0.22;
+/** Grid cell size (as a fraction of scale) for the lower-rock spatial hash. */
+const PAIR_RADIUS_RATIO = 0.12;
+/** Radius of the "column" beneath an upper vertex used to read the supporting
+ *  surface height of the lower rock. Kept small so each upper vertex rests on
+ *  the lower rock directly below it (no cross-column perching). */
+const SUPPORT_RADIUS_RATIO = 0.2;
+/** After the rock lands on the surface it touches at a single point, which on
+ *  rounded stones leaves visible air around the contact. Sinking the rock a
+ *  hair further turns that point into a small contact patch so the stones read
+ *  as resting into each other instead of floating. */
+const SETTLE_SINK_RATIO = 0.05;
 
 function tuning() {
   const mobile = isMobileClient();
@@ -156,15 +165,20 @@ type SettleResult = {
 
 /**
  * Drops the (already oriented + roughly placed) upper rock straight down until
- * one of its bottom vertices first meets one of the lower rock's top vertices.
- * Purely vertex-to-vertex: for each upper vertex we look up the lower vertices
- * sharing its column via the spatial grid and take the smallest positive
- * vertical gap. That smallest gap is the drop distance, so exactly one vertex
- * pair touches and nothing interpenetrates. No bounding boxes involved.
+ * one of its vertices first meets the lower rock's top surface.
+ *
+ * The lower rock's top vertices act as a height field. For each sampled upper
+ * vertex we read the supporting surface height directly beneath it — the
+ * *highest* lower vertex within a small column radius (using the max, not the
+ * nearest, is what stops the rock from settling too high and leaving a gap).
+ * The vertical gap to that support is recorded, and the smallest gap across all
+ * upper vertices is the drop distance: the lowest point lands exactly on its
+ * support, every other point stays at or above its own support (no
+ * interpenetration), and nothing floats.
  */
 function settleOntoLower(
   ctx: LowerContext,
-  bottomLocals: THREE.Vector3[],
+  upperLocals: THREE.Vector3[],
   upperCenterLocal: THREE.Vector3,
   transform: RockTransform,
   samples: number
@@ -172,56 +186,58 @@ function settleOntoLower(
   _scaleVec.setScalar(transform.scale);
   _m.compose(transform.position, transform.quaternion, _scaleVec);
 
-  const step = Math.max(1, Math.floor(bottomLocals.length / samples));
-  const radiusSq = ctx.cellSize * ctx.cellSize;
+  const step = Math.max(1, Math.floor(upperLocals.length / samples));
+  const supportRadius = SUPPORT_RADIUS_RATIO * transform.scale;
+  const supportRadiusSq = supportRadius * supportRadius;
+  const maxRing = Math.max(1, Math.ceil(supportRadius / ctx.cellSize));
 
   let minGap = Infinity;
   let contactX = ctx.topCenter.x;
   let contactZ = ctx.topCenter.z;
 
-  const consider = (
-    wx: number,
-    wy: number,
-    wz: number,
-    lower: THREE.Vector3
-  ) => {
-    const gap = wy - lower.y;
-    if (gap < minGap) {
-      minGap = gap;
-      contactX = (wx + lower.x) * 0.5;
-      contactZ = (wz + lower.z) * 0.5;
-    }
-  };
-
   const world = new THREE.Vector3();
-  for (let i = 0; i < bottomLocals.length; i += step) {
-    world.copy(bottomLocals[i]).applyMatrix4(_m);
+  for (let i = 0; i < upperLocals.length; i += step) {
+    world.copy(upperLocals[i]).applyMatrix4(_m);
     const cx = Math.floor(world.x / ctx.cellSize);
     const cz = Math.floor(world.z / ctx.cellSize);
 
-    for (let gx = -1; gx <= 1; gx++) {
-      for (let gz = -1; gz <= 1; gz++) {
+    // Supporting surface height beneath this vertex = highest lower vertex
+    // inside the column radius.
+    let supportY = -Infinity;
+    let supportX = world.x;
+    let supportZ = world.z;
+    for (let gx = -maxRing; gx <= maxRing; gx++) {
+      for (let gz = -maxRing; gz <= maxRing; gz++) {
         const bucket = ctx.grid.get(`${cx + gx},${cz + gz}`);
         if (!bucket) continue;
         for (const idx of bucket) {
           const lower = ctx.topVerts[idx];
           const dx = world.x - lower.x;
           const dz = world.z - lower.z;
-          if (dx * dx + dz * dz <= radiusSq) {
-            consider(world.x, world.y, world.z, lower);
+          if (dx * dx + dz * dz <= supportRadiusSq && lower.y > supportY) {
+            supportY = lower.y;
+            supportX = lower.x;
+            supportZ = lower.z;
           }
         }
       }
     }
+
+    if (supportY === -Infinity) continue; // overhang — no surface beneath
+    const gap = world.y - supportY;
+    if (gap < minGap) {
+      minGap = gap;
+      contactX = (world.x + supportX) * 0.5;
+      contactZ = (world.z + supportZ) * 0.5;
+    }
   }
 
-  // Rare: the column lookup found nothing (e.g. a very narrow rock perched off
-  // to one side). Fall back to the globally nearest lower vertex — still purely
-  // vertex based, no bounding box.
+  // Nothing sat over the lower rock at all — fall back to the globally nearest
+  // top vertex so the rock still lands on the surface.
   if (!Number.isFinite(minGap)) {
     let bestDistSq = Infinity;
-    for (let i = 0; i < bottomLocals.length; i += step) {
-      world.copy(bottomLocals[i]).applyMatrix4(_m);
+    for (let i = 0; i < upperLocals.length; i += step) {
+      world.copy(upperLocals[i]).applyMatrix4(_m);
       for (const lower of ctx.topVerts) {
         const dx = world.x - lower.x;
         const dz = world.z - lower.z;
@@ -237,7 +253,7 @@ function settleOntoLower(
   }
 
   if (!Number.isFinite(minGap)) minGap = 0;
-  transform.position.y -= minGap;
+  transform.position.y -= minGap + SETTLE_SINK_RATIO * transform.scale;
 
   const comWorld = upperCenterLocal.clone().applyMatrix4(
     _m.compose(
@@ -315,7 +331,7 @@ export function solvePointContactStack(
 
     const settled = settleOntoLower(
       ctx,
-      bottomPool,
+      upperLocals,
       upperCenterLocal,
       transform,
       settleSamples
