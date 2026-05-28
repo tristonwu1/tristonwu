@@ -71,6 +71,36 @@ const META = {
 const ABOUT = {
   eyebrow: "About",
   title: "Triston Wu",
+  born: "San Diego, CA 2000",
+  based: "Lives and works in San Francisco, CA",
+  cv: [
+    {
+      _type: "cvSection",
+      _key: "edu",
+      heading: "Education",
+      entries: [
+        { _type: "cvEntry", _key: "e1", year: "2023", detail: "BFA Furniture Design, RISD" },
+      ],
+    },
+    {
+      _type: "cvSection",
+      _key: "grp",
+      heading: "Group Exhibitions",
+      entries: [
+        { _type: "cvEntry", _key: "g1", year: "2024", detail: "Bent and Borrowed, Gallery 263, Cambridge, MA" },
+        { _type: "cvEntry", _key: "g2", year: "2023", detail: "Playing House, Gelman Gallery, Providence, RI" },
+        { _type: "cvEntry", _key: "g3", year: "2022", detail: "RISD Furniture Design Triennial, Woods Gerry Gallery, Providence, RI" },
+      ],
+    },
+    {
+      _type: "cvSection",
+      _key: "pub",
+      heading: "Publications",
+      entries: [
+        { _type: "cvEntry", _key: "p1", year: "2022", detail: "Rolling Homes, Shelter Publications" },
+      ],
+    },
+  ],
   bio: [
     "Triston Wu is an artist based in California. Working across sculpture, site-specific installation, and functional objects, Wu moves between art and the everyday, holding geometric logic in tension with organic materials and the unpredictability of natural forces. His practice seeks to make invisible forces felt, creating conditions in which the overlooked becomes present and the familiar becomes forgotten.",
   ],

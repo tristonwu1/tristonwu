@@ -41,8 +41,14 @@ const WORKS_QUERY = `*[_type == "work"] | order(order asc, _createdAt asc){
 const ABOUT_QUERY = `*[_type == "about"][0]{
   eyebrow,
   title,
+  "portrait": portrait.asset->url,
+  "portraitAlt": portrait.alt,
+  born,
+  based,
   bio,
   statement,
+  cv[]{ heading, entries[]{ year, detail } },
+  "cvFile": cvFile.asset->url,
   enquiriesEmail,
   instagramLabel,
   instagramUrl
@@ -120,11 +126,17 @@ export async function getAbout(): Promise<AboutContent> {
     return {
       eyebrow: doc.eyebrow ?? staticAbout.eyebrow,
       title: doc.title,
+      portrait: doc.portrait ?? staticAbout.portrait,
+      portraitAlt: doc.portraitAlt ?? staticAbout.portraitAlt,
+      born: doc.born ?? staticAbout.born,
+      based: doc.based ?? staticAbout.based,
       bio: doc.bio && doc.bio.length > 0 ? doc.bio : staticAbout.bio,
       statement:
         doc.statement && doc.statement.length > 0
           ? doc.statement
           : staticAbout.statement,
+      cv: doc.cv && doc.cv.length > 0 ? doc.cv : staticAbout.cv,
+      cvFile: doc.cvFile ?? staticAbout.cvFile,
       enquiriesEmail: doc.enquiriesEmail ?? staticAbout.enquiriesEmail,
       instagramLabel: doc.instagramLabel ?? staticAbout.instagramLabel,
       instagramUrl: doc.instagramUrl ?? staticAbout.instagramUrl,
