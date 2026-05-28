@@ -46,17 +46,23 @@ const styles = StyleSheet.create({
     fontWeight: 400,
     fontSize: 10,
     lineHeight: 1.55,
-    padding: 64,
+    paddingTop: 72,
+    paddingBottom: 64,
+    paddingHorizontal: 64,
   },
   name: {
     fontFamily: "Martel",
     fontWeight: 400,
     fontSize: 20,
+    lineHeight: 1.1,
     letterSpacing: 0.2,
   },
+  metaBlock: {
+    marginTop: 10,
+  },
   meta: {
-    marginTop: 6,
     fontSize: 9.5,
+    lineHeight: 1.5,
     color: COLOR.muted,
   },
   rule: {
@@ -126,8 +132,14 @@ export function CvDocument({ about }: { about: AboutContent }) {
     >
       <Page size="LETTER" style={styles.page}>
         <Text style={styles.name}>{about.title}</Text>
-        {about.born ? <Text style={styles.meta}>Born {about.born}</Text> : null}
-        {about.based ? <Text style={styles.meta}>{about.based}</Text> : null}
+        {about.born || about.based ? (
+          <View style={styles.metaBlock}>
+            {about.born ? (
+              <Text style={styles.meta}>Born {about.born}</Text>
+            ) : null}
+            {about.based ? <Text style={styles.meta}>{about.based}</Text> : null}
+          </View>
+        ) : null}
 
         <View style={styles.rule} />
 

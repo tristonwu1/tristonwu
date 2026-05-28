@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { RockSceneErrorBoundary } from "@/components/RockSceneErrorBoundary";
 import { SiteLoadingScreen } from "@/components/SiteLoadingScreen";
 import { SiteCornerHints } from "@/components/SiteCornerHints";
+import { CustomCursor } from "@/components/CustomCursor";
 import { RockSceneProvider } from "@/contexts/RockSceneContext";
 import { SiteContentProvider } from "@/contexts/SiteContentContext";
 import type { Work } from "@/data/works";
@@ -81,6 +82,7 @@ export function SiteRockProvider({
             ) : null}
             <SiteContentProvider works={works}>{children}</SiteContentProvider>
           </RockSceneProvider>
+          <CustomCursor />
         </div>
       ) : null}
     </>

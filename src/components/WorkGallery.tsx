@@ -30,6 +30,7 @@ export function WorkGallery({ images, title }: WorkGalleryProps) {
             <button
               key={image.src}
               type="button"
+              data-cursor="expand"
               className={`work-gallery-item${
                 imageIndex === 0 ? " work-gallery-item--lead" : ""
               }`}

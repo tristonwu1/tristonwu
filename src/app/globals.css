@@ -374,6 +374,107 @@ a:hover {
   visibility: hidden;
 }
 
+/* Custom cursor (fine-pointer devices only) */
+
+html.cursor-custom,
+html.cursor-custom * {
+  cursor: none !important;
+}
+
+/* The cursor replaces the scroll cue, so hide the corner version. */
+html.cursor-custom .site-corner-hint--scroll {
+  display: none;
+}
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 9000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  color: var(--foreground);
+}
+
+.cursor.cursor--ready {
+  opacity: 1;
+}
+
+.cursor > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.55);
+  transform-origin: center;
+  transition:
+    opacity 0.2s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cursor[data-state="scroll"] .cursor-scroll,
+.cursor[data-state="triangle"] .cursor-triangle,
+.cursor[data-state="expand"] .cursor-expand {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.cursor-scroll {
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cursor-scroll svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cursor[data-state="scroll"] .cursor-scroll svg {
+  animation: cursor-bob 1.6s ease-in-out infinite;
+}
+
+.cursor-scroll-label {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+@keyframes cursor-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.cursor-triangle svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cursor-expand {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.cursor-expand svg {
+  width: 19px;
+  height: 19px;
+}
+
 .site-header-back {
   color: var(--muted);
   pointer-events: auto;
