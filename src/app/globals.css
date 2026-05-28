@@ -417,7 +417,7 @@ html.cursor-custom .site-corner-hint--scroll {
 
 .cursor-scroll-arrow {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   line-height: 1;
   transform: rotate(-90deg);
   transform-origin: center;
@@ -640,6 +640,12 @@ html.cursor-custom .site-corner-hint--scroll {
 
 /* Desktop: lead image stays full opacity, the rest dim until hovered. */
 @media (min-width: 768px) {
+  /* Vertical breathing room so the frame's drop shadow isn't clipped by the
+     scroller's overflow-y: hidden. */
+  .work-gallery-track {
+    padding-block: 2.5rem;
+  }
+
   .work-gallery-item {
     opacity: 0.4;
     transition: opacity 0.45s ease;
@@ -649,6 +655,12 @@ html.cursor-custom .site-corner-hint--scroll {
   .work-gallery-item:hover,
   .work-gallery-item:focus-visible {
     opacity: 1;
+  }
+
+  /* Hovering any other image also dims the lead. */
+  .work-gallery-track:has(.work-gallery-item:hover)
+    .work-gallery-item--lead:not(:hover) {
+    opacity: 0.4;
   }
 }
 
@@ -1109,9 +1121,9 @@ html.cursor-custom .site-corner-hint--scroll {
   padding: 0.55rem 1rem;
   border: 1px solid var(--border);
   border-radius: 999px;
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
   color: var(--foreground);
   transition: border-color 0.2s ease, color 0.2s ease;
 }

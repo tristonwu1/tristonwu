@@ -93,7 +93,7 @@ export default async function AboutPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Download CV (PDF)
+                  CV download
                 </a>
               </div>
             ) : null}
