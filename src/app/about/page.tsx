@@ -63,7 +63,17 @@ export default async function AboutPage() {
 
             {hasCv ? (
               <div className="about-section">
-                <h2 className="about-section-title">CV</h2>
+                <h2 className="about-section-title about-cv-title">
+                  CV
+                  <a
+                    className="about-cv-download"
+                    href="/about/cv"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    download
+                  </a>
+                </h2>
                 <div className="about-cv">
                   {about.cv.map((section) =>
                     section.entries.length > 0 ? (
@@ -87,14 +97,6 @@ export default async function AboutPage() {
                     ) : null
                   )}
                 </div>
-                <a
-                  className="about-cv-download"
-                  href="/about/cv"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  CV download
-                </a>
               </div>
             ) : null}
 

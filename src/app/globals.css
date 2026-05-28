@@ -1113,23 +1113,24 @@ html.cursor-custom .site-corner-hint--scroll {
   font-variant-numeric: tabular-nums;
 }
 
+.about-cv-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
 .about-cv-download {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  margin-top: 1.5rem;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--foreground);
-  transition: border-color 0.2s ease, color 0.2s ease;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  transition: color 0.2s ease;
 }
 
 .about-cv-download:hover {
-  border-color: var(--foreground);
+  color: var(--foreground);
 }
 
 .about-contact {
