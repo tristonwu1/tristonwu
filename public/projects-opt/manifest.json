@@ -1,0 +1,332 @@
+[
+  {
+    "id": "01",
+    "images": [
+      {
+        "webp": "/projects-opt/01-01.webp",
+        "thumb": "/projects-opt/01-01-thumb.webp",
+        "width": 1000,
+        "height": 654,
+        "thumbWidth": 520,
+        "thumbHeight": 340
+      },
+      {
+        "webp": "/projects-opt/01-02.webp",
+        "thumb": "/projects-opt/01-02-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/01-03.webp",
+        "thumb": "/projects-opt/01-03-thumb.webp",
+        "width": 1000,
+        "height": 667,
+        "thumbWidth": 520,
+        "thumbHeight": 347
+      }
+    ]
+  },
+  {
+    "id": "02",
+    "images": [
+      {
+        "webp": "/projects-opt/02-01.webp",
+        "thumb": "/projects-opt/02-01-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/02-02.webp",
+        "thumb": "/projects-opt/02-02-thumb.webp",
+        "width": 818,
+        "height": 1250,
+        "thumbWidth": 445,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/02-03.webp",
+        "thumb": "/projects-opt/02-03-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "03",
+    "images": [
+      {
+        "webp": "/projects-opt/03-01.webp",
+        "thumb": "/projects-opt/03-01-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/03-02.webp",
+        "thumb": "/projects-opt/03-02-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/03-03.webp",
+        "thumb": "/projects-opt/03-03-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/03-04.webp",
+        "thumb": "/projects-opt/03-04-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/03-05.webp",
+        "thumb": "/projects-opt/03-05-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/03-06.webp",
+        "thumb": "/projects-opt/03-06-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/03-07.webp",
+        "thumb": "/projects-opt/03-07-thumb.webp",
+        "width": 675,
+        "height": 900,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "04",
+    "images": [
+      {
+        "webp": "/projects-opt/04-01.webp",
+        "thumb": "/projects-opt/04-01-thumb.webp",
+        "width": 870,
+        "height": 1250,
+        "thumbWidth": 473,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/04-02.webp",
+        "thumb": "/projects-opt/04-02-thumb.webp",
+        "width": 1000,
+        "height": 666,
+        "thumbWidth": 520,
+        "thumbHeight": 346
+      },
+      {
+        "webp": "/projects-opt/04-03.webp",
+        "thumb": "/projects-opt/04-03-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "05",
+    "images": [
+      {
+        "webp": "/projects-opt/05-01.webp",
+        "thumb": "/projects-opt/05-01-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/05-02.webp",
+        "thumb": "/projects-opt/05-02-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/05-03.webp",
+        "thumb": "/projects-opt/05-03-thumb.webp",
+        "width": 804,
+        "height": 1250,
+        "thumbWidth": 437,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/05-04.webp",
+        "thumb": "/projects-opt/05-04-thumb.webp",
+        "width": 834,
+        "height": 1250,
+        "thumbWidth": 454,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "06",
+    "images": [
+      {
+        "webp": "/projects-opt/06-01.webp",
+        "thumb": "/projects-opt/06-01-thumb.webp",
+        "width": 1000,
+        "height": 874,
+        "thumbWidth": 520,
+        "thumbHeight": 455
+      },
+      {
+        "webp": "/projects-opt/06-02.webp",
+        "thumb": "/projects-opt/06-02-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/06-03.webp",
+        "thumb": "/projects-opt/06-03-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/06-04.webp",
+        "thumb": "/projects-opt/06-04-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "07",
+    "images": [
+      {
+        "webp": "/projects-opt/07-01.webp",
+        "thumb": "/projects-opt/07-01-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/07-02.webp",
+        "thumb": "/projects-opt/07-02-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "08",
+    "images": [
+      {
+        "webp": "/projects-opt/08-01.webp",
+        "thumb": "/projects-opt/08-01-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/08-02.webp",
+        "thumb": "/projects-opt/08-02-thumb.webp",
+        "width": 1000,
+        "height": 1241,
+        "thumbWidth": 520,
+        "thumbHeight": 645
+      },
+      {
+        "webp": "/projects-opt/08-03.webp",
+        "thumb": "/projects-opt/08-03-thumb.webp",
+        "width": 898,
+        "height": 1250,
+        "thumbWidth": 488,
+        "thumbHeight": 680
+      }
+    ]
+  },
+  {
+    "id": "09",
+    "images": [
+      {
+        "webp": "/projects-opt/09-01.webp",
+        "thumb": "/projects-opt/09-01-thumb.webp",
+        "width": 1000,
+        "height": 750,
+        "thumbWidth": 520,
+        "thumbHeight": 390
+      },
+      {
+        "webp": "/projects-opt/09-02.webp",
+        "thumb": "/projects-opt/09-02-thumb.webp",
+        "width": 1000,
+        "height": 750,
+        "thumbWidth": 520,
+        "thumbHeight": 390
+      },
+      {
+        "webp": "/projects-opt/09-03.webp",
+        "thumb": "/projects-opt/09-03-thumb.webp",
+        "width": 1000,
+        "height": 750,
+        "thumbWidth": 520,
+        "thumbHeight": 390
+      },
+      {
+        "webp": "/projects-opt/09-04.webp",
+        "thumb": "/projects-opt/09-04-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      },
+      {
+        "webp": "/projects-opt/09-05.webp",
+        "thumb": "/projects-opt/09-05-thumb.webp",
+        "width": 1000,
+        "height": 750,
+        "thumbWidth": 520,
+        "thumbHeight": 390
+      }
+    ]
+  },
+  {
+    "id": "10",
+    "images": [
+      {
+        "webp": "/projects-opt/10-01.webp",
+        "thumb": "/projects-opt/10-01-thumb.webp",
+        "width": 938,
+        "height": 1250,
+        "thumbWidth": 510,
+        "thumbHeight": 680
+      }
+    ]
+  }
+]
