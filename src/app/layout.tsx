@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Martel, Martel_Sans } from "next/font/google";
 import { SiteRockProvider } from "@/components/SiteRockProvider";
+import { getWorks } from "@/sanity/queries";
 import "./globals.css";
 
 const display = Martel({
@@ -21,15 +22,17 @@ export const metadata: Metadata = {
     "Portfolio of furniture and object design by Triston Wu.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const works = await getWorks();
+
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} h-full`}>
       <body className="min-h-full">
-        <SiteRockProvider>{children}</SiteRockProvider>
+        <SiteRockProvider works={works}>{children}</SiteRockProvider>
       </body>
     </html>
   );

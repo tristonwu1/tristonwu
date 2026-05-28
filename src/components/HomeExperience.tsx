@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { works } from "@/data/works";
+import { useWorks } from "@/contexts/SiteContentContext";
 import { Header } from "@/components/Header";
 import { WorkSlide } from "@/components/WorkSlide";
 
 export function HomeExperience() {
+  const works = useWorks();
+
   useEffect(() => {
     document.documentElement.classList.add("home-scroll-snap");
     return () => document.documentElement.classList.remove("home-scroll-snap");

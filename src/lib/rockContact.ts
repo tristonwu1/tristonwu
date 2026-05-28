@@ -5,55 +5,51 @@ import { createSeededRandom, type RockTransform } from "@/lib/rockPlacement";
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const TOP_REGION = 0.34;
 const BOTTOM_REGION = 0.34;
+/** Horizontal tolerance for pairing an upper vertex with a lower one. */
+const PAIR_RADIUS_RATIO = 0.22;
 
 function tuning() {
   const mobile = isMobileClient();
   return {
-    orientAttempts: mobile ? 6 : 12,
-    settleSamples: mobile ? 90 : 150,
-    localSampleCap: mobile ? 260 : 420,
+    orientAttempts: mobile ? 8 : 14,
+    settleSamples: mobile ? 140 : 240,
+    localSampleCap: mobile ? 320 : 520,
+    lowerSampleCap: mobile ? 700 : 1200,
   };
 }
 
 const _m = new THREE.Matrix4();
 const _scaleVec = new THREE.Vector3();
-const _raycaster = new THREE.Raycaster();
-const _rayOrigin = new THREE.Vector3();
-const _rayDir = new THREE.Vector3(0, -1, 0);
-
-export type PointContact = {
-  lowerWorld: THREE.Vector3;
-  upperLocal: THREE.Vector3;
-};
 
 // ---------------------------------------------------------------------------
 // Geometry sampling (pure helpers)
 // ---------------------------------------------------------------------------
 
 /**
- * Vertices in the object's ROOT-local frame — i.e. the frame a RockTransform
- * operates in. The GLB meshes carry their own nested node transforms, so we
- * must bake each mesh's matrix relative to the object root; reading raw
- * geometry positions would place contacts in the wrong space (floating gaps).
+ * Vertices in the object's own frame — i.e. the frame a RockTransform composes
+ * with at render time. The rock is rendered as `<group transform><primitive
+ * object/></group>`, so the points the transform acts on are the object's mesh
+ * vertices baked through their full node hierarchy (`child.matrixWorld`, with
+ * the object detached from any parent). This must match `setFromObject` used
+ * for the base rock; stripping the object's own root matrix here is what left
+ * stones floating.
  */
 function collectLocalVertices(
   object: THREE.Object3D,
   cap = Infinity
 ): THREE.Vector3[] {
+  object.removeFromParent();
   object.updateMatrixWorld(true);
-  const toLocal = new THREE.Matrix4().copy(object.matrixWorld).invert();
-  const rel = new THREE.Matrix4();
   const v = new THREE.Vector3();
   const vertices: THREE.Vector3[] = [];
 
   object.traverse((child) => {
     if (child instanceof THREE.Mesh) {
-      rel.multiplyMatrices(toLocal, child.matrixWorld);
       const position = child.geometry.attributes.position;
       const step = Math.max(1, Math.floor(position.count / Math.max(1, cap)));
       for (let i = 0; i < position.count; i += step) {
         v.set(position.getX(i), position.getY(i), position.getZ(i));
-        v.applyMatrix4(rel);
+        v.applyMatrix4(child.matrixWorld);
         vertices.push(v.clone());
       }
     }
@@ -92,92 +88,59 @@ function localToWorld(local: THREE.Vector3, transform: RockTransform) {
     .add(transform.position);
 }
 
-/** Public: sampled world-space vertices for a transformed object. */
-export function sampleWorldVertices(
-  object: THREE.Object3D,
-  transform: RockTransform,
-  maxSamples = 220
-): THREE.Vector3[] {
-  const locals = collectLocalVertices(object, maxSamples);
-  _scaleVec.setScalar(transform.scale);
-  _m.compose(transform.position, transform.quaternion, _scaleVec);
-  return locals.map((v) => v.applyMatrix4(_m));
-}
-
 // ---------------------------------------------------------------------------
-// Lower-rock raycast context (built once per solve)
+// Lower-rock contact context: a 2D spatial hash over the lower rock's top
+// vertices so each upper vertex can find the lower vertices in its column in
+// roughly O(1), instead of scanning every vertex or raycasting triangles.
 // ---------------------------------------------------------------------------
 
 type LowerContext = {
-  meshes: THREE.Mesh[];
-  /** World-space vertices in the lower rock's top region (for vertex pairing). */
   topVerts: THREE.Vector3[];
+  grid: Map<string, number[]>;
+  cellSize: number;
   topCenter: THREE.Vector3;
   topY: number;
 };
 
-function buildLowerContext(
-  lowerObject: THREE.Object3D,
-  lowerTransform: RockTransform
-): LowerContext {
-  const group = new THREE.Group();
-  group.position.copy(lowerTransform.position);
-  group.quaternion.copy(lowerTransform.quaternion);
-  group.scale.setScalar(lowerTransform.scale);
-  group.add(lowerObject.clone(true));
-  group.updateMatrixWorld(true);
-
-  const meshes: THREE.Mesh[] = [];
-  const box = new THREE.Box3();
-  group.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      meshes.push(child);
-      child.geometry.computeBoundingBox();
-      box.expandByObject(child);
-    }
-  });
-
-  const span = box.max.y - box.min.y || 1;
-  const topThreshold = box.max.y - span * TOP_REGION;
-  const topVerts: THREE.Vector3[] = [];
-  const center = new THREE.Vector3();
-  group.traverse((child) => {
-    if (child instanceof THREE.Mesh) {
-      const pos = child.geometry.attributes.position;
-      const step = Math.max(1, Math.floor(pos.count / 120));
-      for (let i = 0; i < pos.count; i += step) {
-        _rayOrigin.set(pos.getX(i), pos.getY(i), pos.getZ(i));
-        _rayOrigin.applyMatrix4(child.matrixWorld);
-        if (_rayOrigin.y >= topThreshold) {
-          topVerts.push(_rayOrigin.clone());
-          center.add(_rayOrigin);
-        }
-      }
-    }
-  });
-  if (topVerts.length > 0) center.multiplyScalar(1 / topVerts.length);
-  else box.getCenter(center);
-
-  return { meshes, topVerts, topCenter: center, topY: box.max.y };
+function cellKey(x: number, z: number, cell: number): string {
+  return `${Math.floor(x / cell)},${Math.floor(z / cell)}`;
 }
 
-function raycastSurfaceY(
-  ctx: LowerContext,
-  x: number,
-  z: number,
-  fromY: number
-): number | null {
-  _rayOrigin.set(x, fromY, z);
-  _raycaster.set(_rayOrigin, _rayDir);
-  let bestY: number | null = null;
-  for (const mesh of ctx.meshes) {
-    const hits = _raycaster.intersectObject(mesh, false);
-    if (hits.length > 0) {
-      const y = hits[0].point.y;
-      if (bestY === null || y > bestY) bestY = y;
+function buildLowerContext(
+  lowerObject: THREE.Object3D,
+  lowerTransform: RockTransform,
+  sampleCap: number
+): LowerContext {
+  const locals = collectLocalVertices(lowerObject, sampleCap);
+  _scaleVec.setScalar(lowerTransform.scale);
+  _m.compose(lowerTransform.position, lowerTransform.quaternion, _scaleVec);
+
+  const world = locals.map((v) => v.applyMatrix4(_m));
+  const worldBox = boxFromPoints(world);
+  const span = worldBox.max.y - worldBox.min.y || 1;
+  const topThreshold = worldBox.max.y - span * TOP_REGION;
+
+  const topVerts: THREE.Vector3[] = [];
+  const center = new THREE.Vector3();
+  for (const w of world) {
+    if (w.y >= topThreshold) {
+      topVerts.push(w);
+      center.add(w);
     }
   }
-  return bestY;
+  if (topVerts.length > 0) center.multiplyScalar(1 / topVerts.length);
+  else worldBox.getCenter(center);
+
+  const cellSize = Math.max(1e-4, PAIR_RADIUS_RATIO * lowerTransform.scale);
+  const grid = new Map<string, number[]>();
+  topVerts.forEach((v, i) => {
+    const key = cellKey(v.x, v.z, cellSize);
+    const bucket = grid.get(key);
+    if (bucket) bucket.push(i);
+    else grid.set(key, [i]);
+  });
+
+  return { topVerts, grid, cellSize, topCenter: center, topY: worldBox.max.y };
 }
 
 // ---------------------------------------------------------------------------
@@ -193,13 +156,11 @@ type SettleResult = {
 
 /**
  * Drops the (already oriented + roughly placed) upper rock straight down until
- * it first touches the lower rock. Contact is detected two ways and we stop at
- * whichever happens first, so there is never interpenetration:
- *   1. A bottom vertex of the upper rock meeting the lower surface (raycast).
- *   2. A bottom vertex of the upper rock meeting a top vertex of the lower rock
- *      (vertex-to-vertex), within a small horizontal radius.
- * A bounding-box fallback guarantees the rock rests on the crown even when no
- * sample lines up, so a stone can never end up floating in space.
+ * one of its bottom vertices first meets one of the lower rock's top vertices.
+ * Purely vertex-to-vertex: for each upper vertex we look up the lower vertices
+ * sharing its column via the spatial grid and take the smallest positive
+ * vertical gap. That smallest gap is the drop distance, so exactly one vertex
+ * pair touches and nothing interpenetrates. No bounding boxes involved.
  */
 function settleOntoLower(
   ctx: LowerContext,
@@ -212,58 +173,70 @@ function settleOntoLower(
   _m.compose(transform.position, transform.quaternion, _scaleVec);
 
   const step = Math.max(1, Math.floor(bottomLocals.length / samples));
-  // Pair an upper vertex with a lower vertex only when they sit roughly in the
-  // same vertical column.
-  const pairRadiusSq = (0.16 * transform.scale) ** 2;
+  const radiusSq = ctx.cellSize * ctx.cellSize;
 
   let minGap = Infinity;
   let contactX = ctx.topCenter.x;
   let contactZ = ctx.topCenter.z;
 
-  // Fallback bookkeeping: lowest upper vertex regardless of what is beneath it.
-  let lowestY = Infinity;
-  let lowestX = ctx.topCenter.x;
-  let lowestZ = ctx.topCenter.z;
+  const consider = (
+    wx: number,
+    wy: number,
+    wz: number,
+    lower: THREE.Vector3
+  ) => {
+    const gap = wy - lower.y;
+    if (gap < minGap) {
+      minGap = gap;
+      contactX = (wx + lower.x) * 0.5;
+      contactZ = (wz + lower.z) * 0.5;
+    }
+  };
 
+  const world = new THREE.Vector3();
   for (let i = 0; i < bottomLocals.length; i += step) {
-    const world = bottomLocals[i].clone().applyMatrix4(_m);
+    world.copy(bottomLocals[i]).applyMatrix4(_m);
+    const cx = Math.floor(world.x / ctx.cellSize);
+    const cz = Math.floor(world.z / ctx.cellSize);
 
-    if (world.y < lowestY) {
-      lowestY = world.y;
-      lowestX = world.x;
-      lowestZ = world.z;
-    }
-
-    const surfaceY = raycastSurfaceY(ctx, world.x, world.z, world.y + 0.001);
-    if (surfaceY !== null) {
-      const gap = world.y - surfaceY;
-      if (gap < minGap) {
-        minGap = gap;
-        contactX = world.x;
-        contactZ = world.z;
-      }
-    }
-
-    for (const lower of ctx.topVerts) {
-      const dx = world.x - lower.x;
-      const dz = world.z - lower.z;
-      if (dx * dx + dz * dz > pairRadiusSq) continue;
-      const gap = world.y - lower.y;
-      if (gap >= 0 && gap < minGap) {
-        minGap = gap;
-        contactX = (world.x + lower.x) * 0.5;
-        contactZ = (world.z + lower.z) * 0.5;
+    for (let gx = -1; gx <= 1; gx++) {
+      for (let gz = -1; gz <= 1; gz++) {
+        const bucket = ctx.grid.get(`${cx + gx},${cz + gz}`);
+        if (!bucket) continue;
+        for (const idx of bucket) {
+          const lower = ctx.topVerts[idx];
+          const dx = world.x - lower.x;
+          const dz = world.z - lower.z;
+          if (dx * dx + dz * dz <= radiusSq) {
+            consider(world.x, world.y, world.z, lower);
+          }
+        }
       }
     }
   }
 
+  // Rare: the column lookup found nothing (e.g. a very narrow rock perched off
+  // to one side). Fall back to the globally nearest lower vertex — still purely
+  // vertex based, no bounding box.
   if (!Number.isFinite(minGap)) {
-    // Nothing lined up beneath the rock: rest its lowest point on the crown.
-    minGap = lowestY - ctx.topY;
-    contactX = lowestX;
-    contactZ = lowestZ;
+    let bestDistSq = Infinity;
+    for (let i = 0; i < bottomLocals.length; i += step) {
+      world.copy(bottomLocals[i]).applyMatrix4(_m);
+      for (const lower of ctx.topVerts) {
+        const dx = world.x - lower.x;
+        const dz = world.z - lower.z;
+        const d2 = dx * dx + dz * dz;
+        if (d2 < bestDistSq) {
+          bestDistSq = d2;
+          minGap = world.y - lower.y;
+          contactX = (world.x + lower.x) * 0.5;
+          contactZ = (world.z + lower.z) * 0.5;
+        }
+      }
+    }
   }
 
+  if (!Number.isFinite(minGap)) minGap = 0;
   transform.position.y -= minGap;
 
   const comWorld = upperCenterLocal.clone().applyMatrix4(
@@ -303,9 +276,10 @@ export function solvePointContactStack(
   scale: number,
   layerSeed: number
 ): RockTransform {
-  const { orientAttempts, settleSamples, localSampleCap } = tuning();
+  const { orientAttempts, settleSamples, localSampleCap, lowerSampleCap } =
+    tuning();
 
-  const ctx = buildLowerContext(lowerObject, lowerTransform);
+  const ctx = buildLowerContext(lowerObject, lowerTransform, lowerSampleCap);
 
   const upperLocals = collectLocalVertices(upperObject, localSampleCap);
   const upperBox = boxFromPoints(upperLocals);
@@ -321,8 +295,8 @@ export function solvePointContactStack(
     const twist = rng() * Math.PI * 2;
     const quaternion = orientUpper(bottomLocal, upperCenterLocal, twist);
 
-    // Place the chosen bottom point above the lower rock's top centre,
-    // start high, then settle straight down onto the surface.
+    // Place the chosen bottom point above the lower rock's top centre, start
+    // high, then settle straight down onto the surface.
     const worldBottom = bottomLocal
       .clone()
       .multiplyScalar(scale)
@@ -366,14 +340,12 @@ export function solvePointContactStack(
     }
   }
 
-  const final =
-    bestTransform ??
-    {
-      position: new THREE.Vector3(ctx.topCenter.x, ctx.topY, ctx.topCenter.z),
-      quaternion: new THREE.Quaternion(),
-      scale,
-      topAnchor: new THREE.Vector3(),
-    };
+  const final = bestTransform ?? {
+    position: new THREE.Vector3(ctx.topCenter.x, ctx.topY, ctx.topCenter.z),
+    quaternion: new THREE.Quaternion(),
+    scale,
+    topAnchor: new THREE.Vector3(),
+  };
 
   final.topAnchor = getSingleTopContactPoint(
     upperObject,

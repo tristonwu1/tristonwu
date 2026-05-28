@@ -51,7 +51,11 @@ function imagesFor(id: string): WorkImage[] {
   }));
 }
 
-export const works: Work[] = [
+/**
+ * Static seed content. Used as a fallback when Sanity has no published works
+ * yet (and as the source for the one-time import into Sanity).
+ */
+export const staticWorks: Work[] = [
   {
     id: "01",
     title: "Bone Fish",

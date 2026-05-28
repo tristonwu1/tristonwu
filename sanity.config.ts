@@ -9,5 +9,20 @@ export default defineConfig({
   projectId,
   dataset,
   schema,
-  plugins: [structureTool(), visionTool({ defaultApiVersion: apiVersion })],
+  plugins: [
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title("Content")
+          .items([
+            S.listItem()
+              .title("About page")
+              .id("about")
+              .child(S.document().schemaType("about").documentId("about")),
+            S.divider(),
+            S.documentTypeListItem("work").title("Works"),
+          ]),
+    }),
+    visionTool({ defaultApiVersion: apiVersion }),
+  ],
 });

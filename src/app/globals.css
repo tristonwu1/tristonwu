@@ -892,6 +892,19 @@ a:hover {
   line-height: 1.7;
 }
 
+.about-section {
+  margin-top: 2.5rem;
+}
+
+.about-section-title {
+  margin: 0 0 1rem;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
 .about-placeholder {
   color: var(--muted);
   font-size: 0.9rem !important;

@@ -7,7 +7,8 @@ import { RockSceneErrorBoundary } from "@/components/RockSceneErrorBoundary";
 import { SiteLoadingScreen } from "@/components/SiteLoadingScreen";
 import { SiteCornerHints } from "@/components/SiteCornerHints";
 import { RockSceneProvider } from "@/contexts/RockSceneContext";
-import { works } from "@/data/works";
+import { SiteContentProvider } from "@/contexts/SiteContentContext";
+import type { Work } from "@/data/works";
 import { useCanMountRockScene } from "@/hooks/useCanMountRockScene";
 import { useScrollRockScene } from "@/hooks/useScrollRockScene";
 import { useSiteBootstrap } from "@/hooks/useSiteBootstrap";
@@ -18,7 +19,13 @@ const RotatingRock = dynamic(
   { ssr: false }
 );
 
-export function SiteRockProvider({ children }: { children: ReactNode }) {
+export function SiteRockProvider({
+  works,
+  children,
+}: {
+  works: Work[];
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isStudio = pathname?.startsWith("/studio") ?? false;
@@ -30,7 +37,7 @@ export function SiteRockProvider({ children }: { children: ReactNode }) {
     showLoader,
     showApp,
     appVisible,
-  } = useSiteBootstrap(isHome);
+  } = useSiteBootstrap(isHome, worksCount);
   const { stackCount, maxStack, rotationYRef } = useScrollRockScene(
     worksCount,
     isHome && appVisible
@@ -72,7 +79,7 @@ export function SiteRockProvider({ children }: { children: ReactNode }) {
                 />
               </RockSceneErrorBoundary>
             ) : null}
-            {children}
+            <SiteContentProvider works={works}>{children}</SiteContentProvider>
           </RockSceneProvider>
         </div>
       ) : null}

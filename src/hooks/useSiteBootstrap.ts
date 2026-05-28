@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { works } from "@/data/works";
 import { bootstrapHomeWithTimeout } from "@/lib/siteBootstrap";
 import type { PrebuiltRockStack } from "@/lib/prebuildRockStack";
 import { prebuildRockStack } from "@/lib/prebuildRockStack";
@@ -32,9 +31,8 @@ function easeOutCubic(t: number) {
   return 1 - (1 - t) ** 3;
 }
 
-export function useSiteBootstrap(isHome: boolean) {
+export function useSiteBootstrap(isHome: boolean, worksCount: number) {
   const [stackSeed, setStackSeed] = useState(0);
-  const worksCount = works.length;
 
   const [state, setState] = useState<BootstrapState>(() =>
     isHome

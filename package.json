@@ -9,7 +9,8 @@
     "start:lan": "node scripts/start-prod.mjs",
     "prod": "npm run build && node scripts/start-prod.mjs",
     "lint": "eslint",
-    "optimize:images": "node scripts/optimize-project-images.mjs"
+    "optimize:images": "node scripts/optimize-project-images.mjs",
+    "sanity:import": "node scripts/sanity-import.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
