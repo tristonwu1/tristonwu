@@ -320,6 +320,9 @@ a:hover {
 .scroll-cue-arrow {
   display: block;
   flex-shrink: 0;
+  position: relative;
+  /* nudge the glyph up slightly so it optically aligns with the label */
+  top: -2px;
   /* Reuse the same "←" glyph as the back link, rotated to point down. */
   font-size: 1.5em;
   line-height: 1;
@@ -335,37 +338,19 @@ a:hover {
     2px 0 0 var(--background),
     0 -2px 0 var(--background),
     0 2px 0 var(--background);
-  animation: scroll-cue-arrow-bob 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  will-change: transform, opacity;
+  animation: scroll-cue-arrow-bob 1.6s ease-in-out infinite;
+  will-change: transform;
 }
 
-/* ~1s double bob, then 2s pause (rotation kept so the glyph stays pointing down) */
+/* Smooth, continuous bob (rotation baked in so the glyph keeps pointing down) */
 @keyframes scroll-cue-arrow-bob {
   0%,
-  33.333%,
   100% {
     transform: translate3d(0, 0, 0) rotate(-90deg);
-    opacity: 0.55;
   }
 
-  5% {
+  50% {
     transform: translate3d(0, 3px, 0) rotate(-90deg);
-    opacity: 1;
-  }
-
-  10% {
-    transform: translate3d(0, 0.5px, 0) rotate(-90deg);
-    opacity: 0.7;
-  }
-
-  15% {
-    transform: translate3d(0, 3px, 0) rotate(-90deg);
-    opacity: 1;
-  }
-
-  20% {
-    transform: translate3d(0, 0, 0) rotate(-90deg);
-    opacity: 0.55;
   }
 }
 
@@ -427,16 +412,19 @@ html.cursor-custom .site-corner-hint--scroll {
 
 .cursor-scroll {
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
-.cursor-scroll svg {
-  width: 20px;
-  height: 20px;
+.cursor-scroll-arrow {
+  display: block;
+  font-size: 1.5rem;
+  line-height: 1;
+  transform: rotate(-90deg);
+  transform-origin: center;
 }
 
-.cursor[data-state="scroll"] .cursor-scroll svg {
-  animation: cursor-bob 1.6s ease-in-out infinite;
+.cursor[data-state="scroll"] .cursor-scroll-arrow {
+  animation: scroll-cue-arrow-bob 1.6s ease-in-out infinite;
 }
 
 .cursor-scroll-label {
@@ -447,19 +435,9 @@ html.cursor-custom .site-corner-hint--scroll {
   line-height: 1;
 }
 
-@keyframes cursor-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(3px);
-  }
-}
-
 .cursor-triangle svg {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
 }
 
 .cursor-expand {
@@ -658,6 +636,20 @@ html.cursor-custom .site-corner-hint--scroll {
 .work-gallery-item:focus-visible .work-image-frame {
   outline: 1px solid color-mix(in srgb, var(--foreground) 35%, transparent);
   outline-offset: 3px;
+}
+
+/* Desktop: lead image stays full opacity, the rest dim until hovered. */
+@media (min-width: 768px) {
+  .work-gallery-item {
+    opacity: 0.4;
+    transition: opacity 0.45s ease;
+  }
+
+  .work-gallery-item--lead,
+  .work-gallery-item:hover,
+  .work-gallery-item:focus-visible {
+    opacity: 1;
+  }
 }
 
 .work-image-frame {
@@ -972,9 +964,14 @@ html.cursor-custom .site-corner-hint--scroll {
 }
 
 @media (min-width: 768px) {
+  /* The portrait is taken out of flow (fixed), so don't use a grid column for
+     it — just offset the body to clear the pinned portrait. */
   .about-layout {
-    grid-template-columns: 20rem 1fr;
-    gap: 3.5rem;
+    display: block;
+  }
+
+  .about-body {
+    margin-left: 23.5rem; /* 20rem portrait + 3.5rem gap */
   }
 }
 
@@ -987,9 +984,15 @@ html.cursor-custom .site-corner-hint--scroll {
 }
 
 @media (min-width: 768px) {
+  /* Pin the portrait to the viewport, vertically centered, so it stays put
+     while the bio/CV scroll past. */
   .about-portrait {
-    position: sticky;
-    top: 7rem;
+    position: fixed;
+    top: 50%;
+    /* line up with the content's left edge (container padding included) */
+    left: max(1.5rem, calc((100vw - 60rem) / 2 + 1.5rem));
+    width: 20rem;
+    transform: translateY(-50%);
   }
 }
 

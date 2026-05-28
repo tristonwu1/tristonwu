@@ -104,21 +104,15 @@ export function CustomCursor() {
   return (
     <div ref={rootRef} className="cursor" data-state={state} aria-hidden>
       <div className="cursor-scroll">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path
-            d="M12 4 V18 M6 12 L12 18 L18 12"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <span className="cursor-scroll-arrow" aria-hidden>
+          ←
+        </span>
         <span className="cursor-scroll-label">Scroll</span>
       </div>
 
       <div className="cursor-triangle">
-        <svg viewBox="0 0 16 16">
-          <polygon points="3,5 13,5 8,12" fill="currentColor" />
+        <svg viewBox="0 0 24 24">
+          <polygon points="5,2 5,22 21,13" fill="currentColor" />
         </svg>
       </div>
 
