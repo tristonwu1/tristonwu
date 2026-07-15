@@ -25,6 +25,9 @@ function localDevOrigins(): string[] {
 
 const nextConfig: NextConfig = {
   images: {
+    // A custom loader (src/lib/imageLoader.ts) builds the responsive srcset for
+    // Sanity/local images; these qualities must be allow-listed in Next 16.
+    qualities: [72, 75, 84],
     remotePatterns: [
       {
         protocol: "https",

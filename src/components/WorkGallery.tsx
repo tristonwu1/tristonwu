@@ -43,10 +43,12 @@ export function WorkGallery({ images, title }: WorkGalleryProps) {
                 }`}
               >
                 <WorkImageMedia
-                  src={image.thumb}
-                  width={image.thumbWidth}
-                  height={image.thumbHeight}
-                  sizes="(max-width: 768px) 40vw, 22vw"
+                  src={image.src}
+                  blurSrc={image.thumb}
+                  width={image.width}
+                  height={image.height}
+                  quality={72}
+                  sizes="(max-width: 768px) 42vw, 24vw"
                   scrollerRoot={scrollerEl}
                 />
               </div>

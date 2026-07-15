@@ -3,12 +3,17 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useInView } from "@/hooks/useInView";
+import { responsiveImageLoader } from "@/lib/imageLoader";
 
 type WorkImageMediaProps = {
   src: string;
   width: number;
   height: number;
   sizes: string;
+  /** Tiny placeholder shown blurred until the sharp image decodes. */
+  blurSrc?: string;
+  /** Compression quality for the sharp image (defaults to 75). */
+  quality?: number;
   alt?: string;
   scrollerRoot?: Element | null;
 };
@@ -23,6 +28,8 @@ export function WorkImageMedia({
   width,
   height,
   sizes,
+  blurSrc,
+  quality = 75,
   alt = "",
   scrollerRoot = null,
 }: WorkImageMediaProps) {
@@ -52,7 +59,7 @@ export function WorkImageMedia({
         <div className="work-image-stack">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={src}
+            src={blurSrc ?? src}
             alt=""
             aria-hidden
             className="work-image work-image--blur"
@@ -64,10 +71,11 @@ export function WorkImageMedia({
             width={width}
             height={height}
             sizes={sizes}
+            quality={quality}
+            loader={responsiveImageLoader}
             className={`work-image work-image--sharp${
               sharpReady ? " work-image--sharp-ready" : ""
             }`}
-            unoptimized
             loading="lazy"
             decoding="async"
             fetchPriority="low"

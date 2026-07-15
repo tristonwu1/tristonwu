@@ -68,8 +68,11 @@ function mapImage(img: SanityImage): WorkImage | null {
   const thumbHeight = Math.round(thumbWidth * ratio);
 
   return {
-    src: sized(img.url, FULL_WIDTH, 80),
-    thumb: sized(img.url, THUMB_WIDTH, 55),
+    // Raw asset URL — the responsive image loader appends the right width and
+    // quality per device (up to 2x for retina), so nothing looks downsized.
+    src: img.url,
+    // Tiny, heavily compressed placeholder for the instant blur-up.
+    thumb: sized(img.url, 48, 35),
     width,
     height,
     thumbWidth,

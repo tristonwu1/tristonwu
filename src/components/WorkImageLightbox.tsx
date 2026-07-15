@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { WorkImage } from "@/data/works";
+import { responsiveImageLoader } from "@/lib/imageLoader";
 
 const CLOSE_ANIMATION_MS = 220;
 
@@ -98,10 +99,11 @@ export function WorkImageLightbox({
             width={image.width}
             height={image.height}
             sizes="100vw"
+            quality={84}
+            loader={responsiveImageLoader}
             className={`work-lightbox-image work-lightbox-image--full${
               fullReady ? " work-lightbox-image--full-ready" : ""
             }`}
-            unoptimized
             loading="eager"
             decoding="async"
             onLoad={() => setFullReady(true)}
